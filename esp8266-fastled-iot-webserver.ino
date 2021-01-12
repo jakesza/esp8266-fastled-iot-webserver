@@ -66,7 +66,7 @@ extern "C" {
 
 #define DEFAULT_HOSTNAME "LEDs"         // Name that appears in your network, don't use whitespaces, use "-" instead
 
-#define DEVICE_TYPE 0                   // The following types are available
+#define LED_DEVICE_TYPE 0                   // The following types are available
 /*
     0: Generic LED-Strip: a regular LED-Strip without any special arrangement (and Infinity Mirror + Bottle Lighting Pad)
         * Easiest: 5V WS2812B LED-Strip:            https://s.click.aliexpress.com/e/_dZ1hCJ7
@@ -99,16 +99,16 @@ extern "C" {
 //---------------------------------------------------------------------------------------------------------//
 // Device Configuration:
 //---------------------------------------------------------------------------------------------------------//
-#if DEVICE_TYPE == 0                // Generic LED-Strip
+#if LED_DEVICE_TYPE == 0                // Generic LED-Strip
     #define NUM_LEDS 24
     //#define NUM_LEDS 33
     //#define NUM_LEDS 183
     #define BAND_GROUPING    1            // Groups part of the band to save performance and network traffic
-#elif DEVICE_TYPE == 1              // LED MATRIX
+#elif LED_DEVICE_TYPE == 1              // LED MATRIX
     #define LENGTH 32
     #define HEIGHT 8
     //#define AddLogoVisualizers          // (only 32x8) Adds Visualization patterns with logo (currently only HBz)
-#elif DEVICE_TYPE == 2              // 7-Segment Clock
+#elif LED_DEVICE_TYPE == 2              // 7-Segment Clock
     #define NTP_REFRESH_INTERVAL_SECONDS 600            // 10 minutes
     const char* ntpServerName = "at.pool.ntp.org";      // Austrian ntp-timeserver
     int t_offset = 1;                                   // offset added to the time from the ntp server
@@ -122,15 +122,15 @@ extern "C" {
     #define Digit4 23
     // Values for the Big Clock: 58, 0, 14, 30, 44
 
-#elif DEVICE_TYPE == 3              // Desk Lamp
+#elif LED_DEVICE_TYPE == 3              // Desk Lamp
     #define LINE_COUNT    8             // Amount of led strip pieces
     #define LEDS_PER_LINE 10            // Amount of led pixel per single led strip piece
 
-#elif DEVICE_TYPE == 4              // Nanoleafs
+#elif LED_DEVICE_TYPE == 4              // Nanoleafs
     #define LEAFCOUNT 12                // Amount of triangles
     #define PIXELS_PER_LEAF 12          // Amount of LEDs inside 1x Tringle
 
-#elif DEVICE_TYPE == 5              // Animated Logos
+#elif LED_DEVICE_TYPE == 5              // Animated Logos
     // Choose your logo below, remove the comment in front of your design
     // Important: see "LOGO CONFIG" below
 
@@ -158,6 +158,8 @@ extern "C" {
 
     //#define ENABLE_MQTT_SUPPORT               // allows integration in homeassistant/googlehome/mqtt, 
                                                 // mqtt server required, see MQTT Configuration for more, implemented by GitHub/WarDrake
+
+    #define ENABLE_HOMEY_SUPPORT                // Add support for Homey integration (Athom Homey library required)
 
 //---------------------------------------------------------------------------------------------------------//
 
@@ -262,27 +264,27 @@ if you have connected the ring first it should look like this: const int twpOffs
     #define MQTT_PORT 1883
     #define MQTT_USER "MyUserName"
     #define MQTT_PASS ""
-    #if DEVICE_TYPE == 0
+    #if LED_DEVICE_TYPE == 0
         #define MQTT_TOPIC "homeassistant/light/ledstrip"               // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "Ledstrip"
-    #elif DEVICE_TYPE == 1
+    #elif LED_DEVICE_TYPE == 1
         #define MQTT_TOPIC "homeassistant/light/ledmatrix"              // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "Led Matrix"
-    #elif DEVICE_TYPE == 2
+    #elif LED_DEVICE_TYPE == 2
         #define MQTT_TOPIC "homeassistant/light/7-segment-clock"        // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "7 Segment Clock"
-    #elif DEVICE_TYPE == 3
+    #elif LED_DEVICE_TYPE == 3
         #define MQTT_TOPIC "homeassistant/light/desklamp"               // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "Led Desk Lamp"
-    #elif DEVICE_TYPE == 4
+    #elif LED_DEVICE_TYPE == 4
         #define MQTT_TOPIC "homeassistant/light/nanoleafs"              // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "Nanoleafs"
-    #elif DEVICE_TYPE == 5
+    #elif LED_DEVICE_TYPE == 5
         #define MQTT_TOPIC "homeassistant/light/ledlogo"                // MQTT Topic to Publish to for state and config (Home Assistant)
         #define MQTT_TOPIC_SET "/set"                                   // MQTT Topic to subscribe to for changes(Home Assistant)
         #define MQTT_DEVICE_NAME "Animated Logo"
@@ -307,16 +309,16 @@ if you have connected the ring first it should look like this: const int twpOffs
 -----------------------------------------------------------------------------------------------------------//
 ###########################################################################################################*/
 
-#ifdef DEVICE_TYPE
+#ifdef LED_DEVICE_TYPE
 #include <WiFiUdp.h>
 
-#if DEVICE_TYPE == 1
+#if LED_DEVICE_TYPE == 1
     #define PACKET_LENGTH LENGTH
     #define NUM_LEDS (HEIGHT * LENGTH)
     #define PACKET_LENGTH LENGTH
     #define BAND_GROUPING    1
 
-#elif DEVICE_TYPE == 2
+#elif LED_DEVICE_TYPE == 2
     #define PACKET_LENGTH NUM_LEDS
     #define BAND_GROUPING    1
     IPAddress timeServerIP;
@@ -329,12 +331,12 @@ if you have connected the ring first it should look like this: const int twpOffs
     unsigned long last_diff = 0;
     unsigned long ntp_timestamp = 0;
 
-#elif DEVICE_TYPE == 3
+#elif LED_DEVICE_TYPE == 3
     #define NUM_LEDS      (LINE_COUNT * LEDS_PER_LINE)
     #define PACKET_LENGTH LEDS_PER_LINE
     #define BAND_GROUPING    1
 
-#elif DEVICE_TYPE == 4
+#elif LED_DEVICE_TYPE == 4
     #define NUM_LEDS (PIXELS_PER_LEAF * LEAFCOUNT)
     #define PACKET_LENGTH (LEAFCOUNT * 3)
     #define BAND_GROUPING    1
@@ -396,6 +398,10 @@ EspalexaDevice* alexa_main;
 #include <ESP8266mDNS.h>
 #endif // ENABLE_MULTICAST_DNS
 
+#ifdef ENABLE_HOMEY_SUPPORT
+#include <Homey.h>              //Athom Homey library
+float homeyBrightness = 0;
+#endif
 
 CRGB leds[NUM_LEDS];
 
@@ -477,7 +483,7 @@ typedef PatternAndName PatternAndNameList[];
 PatternAndNameList patterns = {
 
     // Time patterns
-#if DEVICE_TYPE == 2                                 // palet  speed  color  spark  twinkle
+#if LED_DEVICE_TYPE == 2                                 // palet  speed  color  spark  twinkle
     { displayTimeStatic,        "Time",                 true,  true,  true,  false, false},
     { displayTimeColorful,      "Time Colorful",        true,  true,  true,  false, false},
     { displayTimeGradient,      "Time Gradient",        true,  true,  true,  false, false},
@@ -485,7 +491,7 @@ PatternAndNameList patterns = {
     { displayTimeRainbow,       "Time Rainbow",         true,  true,  true,  false, false},
 #endif
 
-#if DEVICE_TYPE == 3                                 // palet  speed  color  spark  twinkle
+#if LED_DEVICE_TYPE == 3                                 // palet  speed  color  spark  twinkle
     { pride_Waves,            "Pride Waves",            true,  true,  true,  false, false},
     { pride_Rings,            "Pride Rings",            true,  true,  true,  false, false},
     { colorWaves_hori,        "Vertical Waves",         true,  true,  true,  false, false},
@@ -544,7 +550,7 @@ PatternAndNameList patterns = {
 
 #ifndef REMOVE_VISUALIZATION
     // Visualization Patterns
-#if DEVICE_TYPE == 1                      // Matrix                          // palet  speed  color  spark  twinkle
+#if LED_DEVICE_TYPE == 1                      // Matrix                          // palet  speed  color  spark  twinkle
     { RainbowVisualizer,                  "Rainbow Visualization",              true,  true,  true,  false, false},
     { SingleColorVisualizer,              "Single Color Visualization",         true,  true,  true,  false, false},
     { RainbowVisualizerDoubleSided,       "Rainbow Visualization Outside",      true,  true,  true,  false, false},
@@ -558,7 +564,7 @@ PatternAndNameList patterns = {
     #endif
 #endif
 
-  #ifdef DEVICE_TYPE            // Generic Visualization Patterns                // palet  speed  color  spark  twinkle
+  #ifdef LED_DEVICE_TYPE            // Generic Visualization Patterns                // palet  speed  color  spark  twinkle
     { vuMeterSolid,                 "Solid Volume Visualizer",                      true,  true,  true,  false, false},
     { vuMeterStaticRainbow,         "Static Rainbow Volume Visualizer",             true,  true,  true,  false, false},
     { vuMeterRainbow,               "Flowing Rainbow Volume Visualizer",            true,  true,  true,  false, false},
@@ -580,7 +586,7 @@ PatternAndNameList patterns = {
 
 #endif
 
-#if DEVICE_TYPE == 4                                                       // palet  speed  color  spark  twinkle
+#if LED_DEVICE_TYPE == 4                                                       // palet  speed  color  spark  twinkle
     { NanoleafWaves,                "Nanoleaf Wave Visualizer",               true,  true,  true,  false, false},
     { NanoleafBand,                 "Nanoleaf Rainbow Band Visualizer",       true,  true,  true,  false, false},
     { NanoleafSingleBand,           "Nanoleaf Solid Color Band Visualizer",   true,  true,  true,  false, false},
@@ -810,6 +816,21 @@ void setup() {
     } else {
         Serial.println("Wi-Fi manager portal running");
     }
+
+#ifdef ENABLE_HOMEY_SUPPORT
+    //Start Homey library
+    Homey.begin(cfg.hostname);
+    Homey.setClass("light");
+    Homey.addCapability("onoff", homeyLightOnoff);                    //boolean
+    Homey.addCapability("dim", homeyLightDim);                        //number 0.00 - 1.00
+    //Homey.addCapability("light_hue", setLightHue);                  //number 0.00 - 1.00
+    //Homey.addCapability("light_saturation", setLightSaturation);    //number 0.00 - 1.00
+
+    Homey.setCapabilityValue("onoff", cfg.power);                     //Set initial value
+    Homey.setCapabilityValue("dim", homeyBrightness);                 //Set initial value
+    //Homey.setCapabilityValue("light_hue", ledHue);                  //Set initial value
+    //Homey.setCapabilityValue("light_saturation", ledSaturation);    //Set initial value
+#endif
 
 #ifdef ENABLE_OTA_SUPPORT
 
@@ -1156,7 +1177,7 @@ void setup() {
 
     webServer.on("/pattern", HTTP_POST, []() {
         String value = webServer.arg("value");
-        #if DEVICE_TYPE == 2
+        #if LED_DEVICE_TYPE == 2
         switchedTimePattern = true;
         #endif
         setPattern(value.toInt());
@@ -1231,7 +1252,7 @@ void setup() {
 
     Serial.println("HTTP web server started");
 
-#if DEVICE_TYPE == 2
+#if LED_DEVICE_TYPE == 2
     bool sucess = false;
     while (!sucess) {
         sucess = GetTime();
@@ -1288,6 +1309,10 @@ void loop() {
 #ifdef ENABLE_MULTICAST_DNS
     MDNS.update();
 #endif // ENABLE_MULTICAST_DNS
+
+#ifdef ENABLE_HOMEY_SUPPORT
+    Homey.loop();
+#endif
 
     wifiManager.process();
 
@@ -1427,6 +1452,7 @@ void loop() {
     EVERY_N_SECONDS(10) {
         saveConfig(save_config);
     }
+
 }
 
 void loadConfig()
@@ -1508,6 +1534,23 @@ bool isValidHostname(char *hostname_to_check, long size)
 
     return true;
 }
+
+#ifdef ENABLE_HOMEY_SUPPORT
+void homeyLightOnoff( void ) {
+    setPower(Homey.value.toInt());
+}
+
+void homeyLightDim( void ) {
+    float mappedBrightness = 0.0;
+    homeyBrightness = Homey.value.toFloat();
+    mappedBrightness = mapfloat(homeyBrightness, 0.0, 1.0, 0.0, 255.0);
+    setBrightness((uint8_t) mappedBrightness);
+}
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+#endif
 
 void setPower(uint8_t value)
 {
@@ -1740,7 +1783,7 @@ void strobe()
 
 void rainbow()
 {
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     for (int i = 0; i < LEAFCOUNT; i++)
     {
         uint8_t myHue = (gHue + i * (255 / LEAFCOUNT));
@@ -1769,7 +1812,7 @@ void confetti()
 {
     // random colored speckles that blink in and fade smoothly
     fadeToBlackBy(leds, NUM_LEDS, 10);
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     int pos = random16(LEAFCOUNT * 3);
     int val = gHue + random8(64);
     for (int i = 0; i < (PIXELS_PER_LEAF / 3); i++)
@@ -1805,7 +1848,7 @@ void bpm()
     // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
     uint8_t beat = beatsin8(speed, 64, 255);
     CRGBPalette16 palette = palettes[currentPaletteIndex];
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     for (int i = 0; i < LEAFCOUNT; i++) {
         for (int i2 = 0; i2 < PIXELS_PER_LEAF; i2++)leds[i * PIXELS_PER_LEAF + i2] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
     }
@@ -1883,7 +1926,7 @@ void pride()
     sPseudotime += deltams * msmultiplier;
     sHue16 += deltams * beatsin88(400, 5, 9);
     uint16_t brightnesstheta16 = sPseudotime;
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     for (uint16_t i = 0; i < (LEAFCOUNT * 3); i++) {
 #else
     for (uint16_t i = 0; i < NUM_LEDS; i++) {
@@ -1901,7 +1944,7 @@ void pride()
         CRGB newcolor = CHSV(hue8, sat8, bri8);
 
         uint16_t pixelnumber = i;
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
         pixelnumber = ((LEAFCOUNT * 3) - 1) - pixelnumber;
         for (int i2 = 0; i2 < (PIXELS_PER_LEAF / 3); i2++)
         {
@@ -1996,7 +2039,7 @@ uint8_t beatsaw8(accum88 beats_per_minute, uint8_t lowest, uint8_t highest,
 
 void colorWaves()
 {
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     colorwaves(leds, LEAFCOUNT * 3, gCurrentPalette);
 #else
     colorwaves(leds, NUM_LEDS, gCurrentPalette);
@@ -2052,7 +2095,7 @@ void colorwaves(CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
         CRGB newcolor = ColorFromPalette(palette, index, bri8);
 
         uint16_t pixelnumber = i;
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
         pixelnumber = ((LEAFCOUNT * 3) - 1) - pixelnumber;
         for (int i2 = 0; i2 < (PIXELS_PER_LEAF / 3); i2++)
         {
@@ -2284,7 +2327,7 @@ void lightning()
 
 
 //##################### Desk Lamp
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
 
 void pride_Waves()
 {
@@ -2487,7 +2530,7 @@ void rainbow_vert()
 #endif
 
 // #################### Clock
-#if DEVICE_TYPE == 2
+#if LED_DEVICE_TYPE == 2
 unsigned long sendNTPpacket(IPAddress& address)
 {
     //Serial.println("sending NTP packet...");
@@ -2845,7 +2888,7 @@ void DrawDigit(int offset, int segmentLedCount, int r, int g, int b, int n, int 
 void initUdp(int port)
 {
     Udp.begin(port);
-#if DEVICE_TYPE == 2
+#if LED_DEVICE_TYPE == 2
     udpTime.begin(localPortTime);
 #endif
 }
@@ -3032,7 +3075,7 @@ void vuMeter(CHSV c, int mode)
 {
     int vol = getVolume(incomingPacket, BAND_START, BAND_END, 1.75);
     fill_solid(leds, NUM_LEDS, CRGB::Black);
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     int toPaint = map(vol, 0, 255, 0, LEDS_PER_LINE);
     if(mode == 0)    for (int i = 0; i < toPaint; i++)ColorSingleRing(i,c);
     else if(mode == 1) for (int i = 0; i < toPaint; i++)ColorSingleRing(i,CHSV(map(i, 0, LEDS_PER_LINE, 0,255),255,255));
@@ -3055,7 +3098,7 @@ void vuMeterTriColor()
     }
     int vol = getVolume(incomingPacket, BAND_START, BAND_END, 1.75);
     fill_solid(leds, NUM_LEDS, CRGB::Black);
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     int toPaint = map(vol, 0, 255, 0, LEDS_PER_LINE);
     if (vol < 153) for(int i = 0;i<toPaint;i++)ColorSingleRing(i,CRGB::Green);
     else if (vol < 204)
@@ -3480,7 +3523,7 @@ void Band(int grpSize, CRGB x, int mergePacket)
         if (x.r == 0 && x.g == 0 && x.b == 0)
         {
             uint8_t h = gHue + 255.0 * (((double)i) / ((double)PACKET_LENGTH));
-#if DEVICE_TYPE==3
+#if LED_DEVICE_TYPE==3
             ColorSingleRing(i, CHSV(h, 255, mult));
 #else
             //leds[i] = CHSV(h, 255, mult);
@@ -3490,7 +3533,7 @@ void Band(int grpSize, CRGB x, int mergePacket)
         else
         {
             CRGB y = CRGB(x.r * (mult / 255.0), x.g * (mult / 255.0), x.b * (mult / 255.0));
-#if DEVICE_TYPE==3
+#if LED_DEVICE_TYPE==3
             ColorSingleRing(i, y);
 #else
             fill_solid(leds + i * (grpSize / mergePacket), grpSize, y);
@@ -3548,7 +3591,7 @@ void BulletVisualizer()
     if (i_pos >= AVG_ARRAY_SIZE)i_pos = 0;
     lastVals[i_pos] = currentVolume;
 }
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
 void NanoleafBand()
 {
     int grp = PIXELS_PER_LEAF;    // All pixels in one leaf will be merged into one element
@@ -3610,18 +3653,18 @@ void CentralVisualizer()
 
 void ShiftLedsCenter(int shiftAmount)
 {
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
     shiftAmount *= (PIXELS_PER_LEAF / 3);
 #endif
     for (int cnt = 0; cnt < shiftAmount; cnt++)
     {
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
         for (int i = 0; i < (LEDS_PER_LINE / 2); i++)
         {
             ColorSingleRing(i, leds[i + 1]);
             ColorSingleRing(LEDS_PER_LINE - i, leds[LEDS_PER_LINE - i - 1]);
         }
-//#elif DEVICE_TYPE == 4
+//#elif LED_DEVICE_TYPE == 4
 //        for (int i = 0; i < (NUM_LEDS / 2); i++)
 //        {
 //            leds[i] = leds[i + 1];
@@ -3646,10 +3689,10 @@ void ShiftLedsCenter(int shiftAmount)
 
 void SendLedsCenter(CHSV c)
 {
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     if ((LEDS_PER_LINE % 2) == 0) ColorSingleRing((LEDS_PER_LINE / 2) - 1, c);
     ColorSingleRing(LEDS_PER_LINE / 2.0, c);
-#elif DEVICE_TYPE == 4
+#elif LED_DEVICE_TYPE == 4
     int p = (LEAFCOUNT * 3) / 2.0;
     ColorSingleNanoleafCorner(p, c);
     if (((LEAFCOUNT * 3) % 2) == 0) ColorSingleNanoleafCorner(p-1, c);
@@ -3669,9 +3712,9 @@ void SendLedsCenter(CHSV c)
 void SendLeds(CHSV c, int shiftAmount)
 {
     for (int i = 0; i < shiftAmount; i++) {
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     ColorSingleRing(i, c);
-#elif DEVICE_TYPE == 4
+#elif LED_DEVICE_TYPE == 4
         ColorSingleNanoleafCorner(i, c);
 #else
         leds[i] = c;
@@ -3693,7 +3736,7 @@ void SendTrailingLeds(CHSV c, int shiftAmount)
     }
 }
 
-#if DEVICE_TYPE == 4
+#if LED_DEVICE_TYPE == 4
 void ColorSingleNanoleafCorner(int pos, CRGB x)
 {
     int start = pos * (PIXELS_PER_LEAF / 3); 
@@ -3704,10 +3747,10 @@ void ColorSingleNanoleafCorner(int pos, CRGB x)
 void ShiftLeds(int shiftAmount)
 {
     int cnt = shiftAmount;
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     for (int i = LEDS_PER_LINE - 1; i >= cnt; i--)
         ColorSingleRing(i,leds[i-cnt]);
-#elif DEVICE_TYPE == 4
+#elif LED_DEVICE_TYPE == 4
     cnt *= (PIXELS_PER_LEAF / 3);
     for (int i = NUM_LEDS - 1; i >= cnt; i--) {
         leds[i] = leds[i - cnt];
@@ -3723,7 +3766,7 @@ void ShiftLeds(int shiftAmount)
 
 
 
-#if DEVICE_TYPE == 1
+#if LED_DEVICE_TYPE == 1
 
 void RainbowVisualizer()
 {
@@ -4497,7 +4540,7 @@ void soundReactive()
 
     if (level < minlevel)level = minlevel;
     if (level > NUM_LEDS)level = NUM_LEDS;
-#if DEVICE_TYPE == 3
+#if LED_DEVICE_TYPE == 3
     ColorSingleRing(map(level,1,NUM_LEDS,1,LEDS_PER_LINE), CHSV(gHue, 255, 255));
 #else
     fill_solid(leds, level, CHSV(gHue, 255, 255));
