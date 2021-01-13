@@ -823,12 +823,12 @@ void setup() {
     Homey.setClass("light");
     Homey.addCapability("onoff", homeyLightOnoff);                    //boolean
     Homey.addCapability("dim", homeyLightDim);                        //number 0.00 - 1.00
-    //Homey.addCapability("light_hue", setLightHue);                  //number 0.00 - 1.00
+    Homey.addCapability("light_hue", homeyLightHue);                  //number 0.00 - 1.00
     //Homey.addCapability("light_saturation", setLightSaturation);    //number 0.00 - 1.00
 
     Homey.setCapabilityValue("onoff", cfg.power);                     //Set initial value
     Homey.setCapabilityValue("dim", homeyBrightness);                 //Set initial value
-    //Homey.setCapabilityValue("light_hue", ledHue);                  //Set initial value
+    Homey.setCapabilityValue("light_hue", gHue);                      //Set initial value
     //Homey.setCapabilityValue("light_saturation", ledSaturation);    //Set initial value
 #endif
 
@@ -1553,6 +1553,14 @@ void homeyLightDim( void ) {
     homeyBrightness = Homey.value.toFloat();
     mappedBrightness = mapfloat(homeyBrightness, 0.0, 1.0, 0.0, 255.0);
     setBrightness((uint8_t) mappedBrightness);
+}
+
+void homeyLightHue( void ) {
+    float homeyHue = Homey.value.toFloat();
+    gHue = (uint8_t) mapfloat(homeyHue, 0.0, 1.0, 0.0, 255.0);
+    setAutoplay(false);
+    setPatternName(String("Solid Color"));
+    rainbowSolid();
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
