@@ -403,7 +403,7 @@ EspalexaDevice* alexa_main;
 float homeyBrightness = 0.0;
 float homeyHue = 0.6274509804;  // Blue
 float homeySat = 1.0;           // Full
-bool  hemoySolidColor = false;
+bool  homeySolidColor = false;
 #endif
 
 CRGB leds[NUM_LEDS];
@@ -1554,14 +1554,14 @@ void homeyLightHue( void ) {
     homeyHue = Homey.value.toFloat();
     setAutoplay(false);
     setPatternName(String("Solid Color"));
-    hemoySolidColor = true;
+    homeySolidColor = true;
 }
 
 void homeyLightSaturation( void ) {
     homeySat = Homey.value.toFloat();
     setAutoplay(false);
     setPatternName(String("Solid Color"));
-    hemoySolidColor = true;
+    homeySolidColor = true;
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -1650,7 +1650,7 @@ void adjustPattern(bool up)
 
 #ifdef ENABLE_HOMEY_SUPPORT
     if (patterns[currentPatternIndex].name == String("Solid Color")) {
-        hemoySolidColor = false;
+        homeySolidColor = false;
     }
 #endif
     broadcastInt("pattern", currentPatternIndex);
@@ -1670,7 +1670,7 @@ void setPattern(uint8_t value)
 
 #ifdef ENABLE_HOMEY_SUPPORT
     if (patterns[currentPatternIndex].name == String("Solid Color")) {
-        hemoySolidColor = false;
+        homeySolidColor = false;
     }
 #endif
 
@@ -1770,15 +1770,17 @@ void strandTest()
 void showSolidColor()
 {
     #ifdef ENABLE_HOMEY_SUPPORT
-    if (hemoySolidColor == true) {
+    if (homeySolidColor == true) {
         uint8_t tmpHue = (uint8_t) mapfloat(homeyHue, 0.0, 1.0, 0.0, 255.0);
         uint8_t tmpSat = (uint8_t) mapfloat(homeySat, 0.0, 1.0, 0.0, 255.0);
         fill_solid(leds, NUM_LEDS, CHSV(tmpHue, tmpSat, 255));
     } else {
+    #endif
+
         fill_solid(leds, NUM_LEDS, solidColor);
+
+    #ifdef ENABLE_HOMEY_SUPPORT
     }
-    #else
-    fill_solid(leds, NUM_LEDS, solidColor);
     #endif
 }
 
