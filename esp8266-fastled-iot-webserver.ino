@@ -1453,6 +1453,14 @@ void loop() {
         saveConfig(save_config);
     }
 
+    static int loop_counter = 0;
+    EVERY_N_SECONDS(1) {
+        Serial.print("Stats: ");
+        Serial.print(loop_counter);
+        Serial.println(" loops/s");
+        loop_counter = 0;
+    }
+    loop_counter += 1;
 }
 
 void loadConfig()
