@@ -400,7 +400,10 @@ EspalexaDevice* alexa_main;
 
 #ifdef ENABLE_HOMEY_SUPPORT
 #include <Homey.h>              //Athom Homey library
-float homeyBrightness = 0;
+float homeyBrightness = 0.0;
+float homeyHue = 0.6274509804;  // Blue
+float homeySat = 1.0;           // Full
+bool  hemoySolidColor = false;
 #endif
 
 CRGB leds[NUM_LEDS];
@@ -824,12 +827,12 @@ void setup() {
     Homey.addCapability("onoff", homeyLightOnoff);                    //boolean
     Homey.addCapability("dim", homeyLightDim);                        //number 0.00 - 1.00
     Homey.addCapability("light_hue", homeyLightHue);                  //number 0.00 - 1.00
-    //Homey.addCapability("light_saturation", setLightSaturation);    //number 0.00 - 1.00
+    Homey.addCapability("light_saturation", homeyLightSaturation);    //number 0.00 - 1.00
 
     Homey.setCapabilityValue("onoff", cfg.power);                     //Set initial value
     Homey.setCapabilityValue("dim", homeyBrightness);                 //Set initial value
-    Homey.setCapabilityValue("light_hue", gHue);                      //Set initial value
-    //Homey.setCapabilityValue("light_saturation", ledSaturation);    //Set initial value
+    Homey.setCapabilityValue("light_hue", homeyHue);                  //Set initial value
+    Homey.setCapabilityValue("light_saturation", homeySat);           //Set initial value
 #endif
 
 #ifdef ENABLE_OTA_SUPPORT
@@ -1556,11 +1559,17 @@ void homeyLightDim( void ) {
 }
 
 void homeyLightHue( void ) {
-    float homeyHue = Homey.value.toFloat();
-    gHue = (uint8_t) mapfloat(homeyHue, 0.0, 1.0, 0.0, 255.0);
+    homeyHue = Homey.value.toFloat();
+    hemoySolidColor = true;
     setAutoplay(false);
     setPatternName(String("Solid Color"));
-    rainbowSolid();
+}
+
+void homeyLightSaturation( void ) {
+    homeySat = Homey.value.toFloat();
+    hemoySolidColor = true;
+    setAutoplay(false);
+    setPatternName(String("Solid Color"));
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -1647,6 +1656,11 @@ void adjustPattern(bool up)
     }
 #endif
 
+#ifdef ENABLE_HOMEY_SUPPORT
+    if (patterns[currentPatternIndex].name == String("Solid Color")) {
+      hemoySolidColor = false;
+    }
+#endif
     broadcastInt("pattern", currentPatternIndex);
 }
 
@@ -1661,6 +1675,12 @@ void setPattern(uint8_t value)
         cfg.currentPatternIndex = currentPatternIndex;
         save_config = true;
     }
+
+#ifdef ENABLE_HOMEY_SUPPORT
+    if (patterns[currentPatternIndex].name == String("Solid Color")) {
+      hemoySolidColor = false;
+    }
+#endif
 
     broadcastInt("pattern", currentPatternIndex);
 }
@@ -1757,7 +1777,17 @@ void strandTest()
 
 void showSolidColor()
 {
+    #ifdef ENABLE_HOMEY_SUPPORT
+    if (hemoySolidColor == true) {
+        uint8_t tmpHue = (uint8_t) mapfloat(homeyHue, 0.0, 1.0, 0.0, 255.0);
+        uint8_t tmpSat = (uint8_t) mapfloat(homeySat, 0.0, 1.0, 0.0, 255.0);
+        fill_solid(leds, NUM_LEDS, CHSV(tmpHue, tmpSat, 255));
+    } else {
+        fill_solid(leds, NUM_LEDS, solidColor);
+    }
+    #else
     fill_solid(leds, NUM_LEDS, solidColor);
+    #endif
 }
 
 // Patterns from FastLED example DemoReel100: https://github.com/FastLED/FastLED/blob/master/examples/DemoReel100/DemoReel100.ino
