@@ -1456,14 +1456,6 @@ void loop() {
         saveConfig(save_config);
     }
 
-    static int loop_counter = 0;
-    EVERY_N_SECONDS(1) {
-        Serial.print("Stats: ");
-        Serial.print(loop_counter);
-        Serial.println(" loops/s");
-        loop_counter = 0;
-    }
-    loop_counter += 1;
 }
 
 void loadConfig()
@@ -1560,16 +1552,16 @@ void homeyLightDim( void ) {
 
 void homeyLightHue( void ) {
     homeyHue = Homey.value.toFloat();
-    hemoySolidColor = true;
     setAutoplay(false);
     setPatternName(String("Solid Color"));
+    hemoySolidColor = true;
 }
 
 void homeyLightSaturation( void ) {
     homeySat = Homey.value.toFloat();
-    hemoySolidColor = true;
     setAutoplay(false);
     setPatternName(String("Solid Color"));
+    hemoySolidColor = true;
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -1658,7 +1650,7 @@ void adjustPattern(bool up)
 
 #ifdef ENABLE_HOMEY_SUPPORT
     if (patterns[currentPatternIndex].name == String("Solid Color")) {
-      hemoySolidColor = false;
+        hemoySolidColor = false;
     }
 #endif
     broadcastInt("pattern", currentPatternIndex);
@@ -1678,7 +1670,7 @@ void setPattern(uint8_t value)
 
 #ifdef ENABLE_HOMEY_SUPPORT
     if (patterns[currentPatternIndex].name == String("Solid Color")) {
-      hemoySolidColor = false;
+        hemoySolidColor = false;
     }
 #endif
 
