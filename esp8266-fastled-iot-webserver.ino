@@ -828,6 +828,8 @@ void setup() {
     Homey.addCapability("dim", homeyLightDim);                        //number 0.00 - 1.00
     Homey.addCapability("light_hue", homeyLightHue);                  //number 0.00 - 1.00
     Homey.addCapability("light_saturation", homeyLightSaturation);    //number 0.00 - 1.00
+    Homey.addCapability("speaker_next", homeyNext);                   //boolean
+    Homey.addCapability("speaker_prev", homeyPrev);                   //boolean
 
     Homey.setCapabilityValue("onoff", cfg.power);                     //Set initial value
     Homey.setCapabilityValue("dim", homeyBrightness);                 //Set initial value
@@ -1562,6 +1564,14 @@ void homeyLightSaturation( void ) {
     setAutoplay(false);
     setPatternName(String("Solid Color"));
     homeySolidColor = true;
+}
+
+void homeyNext( void ) {
+    adjustPattern(true);
+}
+
+void homeyPrev( void ) {
+    adjustPattern(false);
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
