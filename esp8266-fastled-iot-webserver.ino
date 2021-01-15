@@ -1567,10 +1567,12 @@ void homeyLightSaturation( void ) {
 }
 
 void homeyNext( void ) {
+    setAutoplay(false);
     adjustPattern(true);
 }
 
 void homeyPrev( void ) {
+    setAutoplay(false);
     adjustPattern(false);
 }
 
